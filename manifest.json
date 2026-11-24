@@ -1,0 +1,29 @@
+{
+  "manifest_version": 3,
+  "name": "Oscar Screening - PORTUGAL (PT)",
+  "version": "3.5",
+  "icons": {
+    "16": "icon.png",
+    "48": "icon.png",
+    "128": "icon.png"
+  },
+  "action": {
+    "default_icon": "icon.png",
+    "default_title": "Oscar Screening PT"
+  },
+  "permissions": ["activeTab", "scripting"],
+  "host_permissions": [
+    "https://admin.oscar-app.com/*",
+    "http://localhost:5005/*",
+    "https://*.ngrok-free.app/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://admin.oscar-app.com/partner/*"],
+      "js": ["content.js"]
+    }
+  ]
+}
