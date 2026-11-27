@@ -118,7 +118,7 @@ async function requestMissingDocuments(workerId, missingKeys = []) {
 // =========================================================================
 // 2. EXTRACCIÓN DE DATOS DEL PERFIL DEL TÉCNICO EN EL DOM (PORTUGAL)
 // =========================================================================
-const IBAN_PT_REGEX = /^PT\d{23}$/;
+const IBAN_REGEX = /^[A-Z]{2}\d{2}[A-Z0-9]{11,30}$/;
 const NIF_PT_REGEX = /^[12356789]\d{8}$/;
 
 function extractProfileData() {
@@ -195,11 +195,11 @@ function extractProfileData() {
   const registeredPhone = findValueByLabels(["Phone number:", "Phone:", "Telefone:", "Telemóvel:", "Mobile:", "Teléfono:"]) ||
     document.querySelector("input[type='tel']")?.value || "";
 
-  // Capturar IBAN y NIF estrictamente validados + sessionStorage saneado
+  // Capturar IBAN válido (PT, BE de Wise, ES, etc.) y NIF estrictamente validados + sessionStorage saneado
   let registeredIban = (sessionStorage.getItem(`oscar_iban_${workerId}`) || "").replace(/[\s-]/g, "").toUpperCase();
   let registeredNif = (sessionStorage.getItem(`oscar_nif_${workerId}`) || "").replace(/[\s-]/g, "");
 
-  if (!IBAN_PT_REGEX.test(registeredIban)) {
+  if (!IBAN_REGEX.test(registeredIban)) {
     registeredIban = "";
     sessionStorage.removeItem(`oscar_iban_${workerId}`);
   }
@@ -211,11 +211,11 @@ function extractProfileData() {
   let domIban = getInputValueByLabel(["IBAN:", "IBAN"]).replace(/[\s-]/g, "").toUpperCase();
   let domNif = getInputValueByLabel(["NIF:", "NIF"]).replace(/[\s-]/g, "");
 
-  if (!IBAN_PT_REGEX.test(domIban) || !NIF_PT_REGEX.test(domNif)) {
+  if (!IBAN_REGEX.test(domIban) || !NIF_PT_REGEX.test(domNif)) {
     const allInputs = Array.from(document.querySelectorAll("input"));
     for (const inp of allInputs) {
       const compactVal = (inp.value || "").replace(/[\s-]/g, "").trim();
-      if (!IBAN_PT_REGEX.test(domIban) && IBAN_PT_REGEX.test(compactVal.toUpperCase())) {
+      if (!IBAN_REGEX.test(domIban) && IBAN_REGEX.test(compactVal.toUpperCase())) {
         domIban = compactVal.toUpperCase();
       } else if (!NIF_PT_REGEX.test(domNif) && NIF_PT_REGEX.test(compactVal)) {
         domNif = compactVal;
@@ -223,7 +223,7 @@ function extractProfileData() {
     }
   }
 
-  if (IBAN_PT_REGEX.test(domIban)) {
+  if (IBAN_REGEX.test(domIban)) {
     registeredIban = domIban;
     sessionStorage.setItem(`oscar_iban_${workerId}`, domIban);
   }
@@ -622,7 +622,7 @@ setInterval(() => {
   const inputs = Array.from(document.querySelectorAll("input"));
   for (const inp of inputs) {
     const val = (inp.value || "").replace(/[\s-]/g, "").trim();
-    if (IBAN_PT_REGEX.test(val.toUpperCase())) {
+    if (IBAN_REGEX.test(val.toUpperCase())) {
       sessionStorage.setItem(`oscar_iban_${wId}`, val.toUpperCase());
     } else if (NIF_PT_REGEX.test(val)) {
       sessionStorage.setItem(`oscar_nif_${wId}`, val);
